@@ -1,0 +1,21 @@
+<?php
+
+// echo $request;
+
+switch ($request) {
+    case '/learn_php' :
+        require __DIR__ . '/frontend/login.php';
+        break;
+    case '/learn_php/' :
+        require __DIR__ . '/frontend/login.php';
+        break;
+    case '/learn_php/chat' :
+        require __DIR__ . '/frontend/chatapp.php';
+        break;
+    default:
+        http_response_code(404);
+        require __DIR__ . '/frontend/404.php';
+        break;
+}
+
+?>
