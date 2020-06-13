@@ -2,14 +2,24 @@
 
 session_start();
 
+if(isset($_SESSION['badcookie'])) {
+  echo "<script>alert('Cookies were tampered. Please login again.');</script>";
+  unset($_SESSION['badcookie']);
+}
+
 if(isset($_SESSION['validatepass'])) {
-  echo "<script>alert('Check your email for the validation link')";
+  echo "<script>alert('Check your email for the validation link');</script>";
   unset($_SESSION['validatepass']);
 }
 
-if(isset($_SESSION['navail'])) {
+if(isset($_SESSION['navailusername'])) {
   echo "<script>alert('Username not available');</script>";
-  unset($_SESSION['navail']);
+  unset($_SESSION['navailusername']);
+}
+
+if(isset($_SESSION['navailemail'])) {
+  echo "<script>alert('Email not available');</script>";
+  unset($_SESSION['navailemail']);
 }
 
 if(isset($_SESSION['loginerror'])) {
@@ -41,19 +51,20 @@ if(isset($_POST['login'])){
       die;
     }
 
-    if(is_queued_for_validation($username)) {
+    if(is_queued_for_validation($username) || !isVerified($username)) {
       $_SESSION['validatepass']  = 1;
       header('Location:login.php');
       die;
     }
 
     if(isset($_POST['remember'])) {
-      setcookie('token', $username.",".$passhash, time() + 86400*30, "/learn_php/", isset($_SERVER["HTTPS"]));
+      setcookie('token', $username.",".$passhash, time() + 86400*30);
     }
 
-    $_SESSION['user'] = $username;
+    $_SESSION['username'] = $username;
 
-    header('Location:frontend/chatapp.php');
+    header('Location:chatapp.php');
+    exit();
   }
 }
 else if(isset($_POST['register']) && isset($_POST['full_name']) && isset($_POST['username']) && isset($_POST['email']) && isset($_POST['password'])) {
@@ -64,14 +75,20 @@ else if(isset($_POST['register']) && isset($_POST['full_name']) && isset($_POST[
 
   // var_dump($email, $username, $passhash, $fullname);
 
-  if(!$email || !$username || !$passhash || !$fullname || strlen($username) < 4 || strlen($username) > 20 || strlen($email) > 60 || strlen($fullname) > 50) {
+  if(strlen($_POST['password']) < 8 || !$email || !$username || !$passhash || !$fullname || strlen($username) < 4 || strlen($username) > 20 || strlen($email) > 60 || strlen($fullname) > 50) {
       $_SESSION['registererror'] = 1;
       header('Location:login.php');
       die;
   }
 
   if(!username_available($username)) {
-    $_SESSION['navail'] = 1;
+    $_SESSION['navailusername'] = 1;
+    header('Location:login.php');
+    die;
+  }
+
+  if(!email_available($email)) {
+    $_SESSION['navailemail'] = 1;
     header('Location:login.php');
     die;
   }
@@ -79,6 +96,9 @@ else if(isset($_POST['register']) && isset($_POST['full_name']) && isset($_POST[
   adduser($fullname, $email, $username, $passhash);
 
   $_SESSION['validatepass'] = 1;
+
+  header('Location:login.php');
+  die();
 }
 
 ?>
@@ -111,10 +131,10 @@ else if(isset($_POST['register']) && isset($_POST['full_name']) && isset($_POST[
           <form class="forms_form" action="" method="POST">
             <div class="forms_fieldset">
               <div class="forms_field">
-                <input type="text" name = "username" placeholder="username" class="forms_field-input" required autofocus />
+                <input autocomplete = "on" type="text" name = "username" placeholder="username" class="forms_field-input" required autofocus />
               </div>
               <div class="forms_field">
-                <input type="password" name = "password" placeholder="password" class="forms_field-input" required />
+                <input autocomplete = "on" type="password" name = "password" placeholder="password" class="forms_field-input" required />
               </div>
               <div class="forms_field">
               <input type="checkbox" name="remember" id="rememberMe">

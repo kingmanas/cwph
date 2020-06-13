@@ -3,6 +3,11 @@ body {
   background: url(../resources/geometric-leaves.png);
 }
 
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
 .container {
   padding:0;
   background-color: #FFF; 
@@ -58,6 +63,16 @@ body {
   overflow: scroll;
   background-color: #87a3ec;
   display: inline-block;
+}
+
+.discussions.mobile {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  overflow-y: scroll;
+  background-color: #87a3ec;
+  display: block;
 }
 
 .discussions .discussion {

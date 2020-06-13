@@ -1,16 +1,22 @@
 <?php
 
-session_start();
+include_once('utility.php');
 
-include_once('database.php');
-$conn = createDatabase();
-
+if(isset($_SESSION['username'])) {
+    header('Location: frontend/chatapp.php');
+    die;
+}
 if(isset($_COOKIE['token'])) {
     list($username, $passhash) = explode(",", $_COOKIE['token']);
+    if(matchhash($username, $passhash)) {
+        $_SESSION['username'] = $username;
+        header('Location: frontend/chatapp.php');
+        exit();
+    }
 }
 else {
     header("location:frontend/login.php");
-    die;
+    exit();
 }
 
 ?>
